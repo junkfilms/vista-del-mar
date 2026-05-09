@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vista Del Mar — Production Timeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#F4F2EE;
+    --surface:#FFFFFF;
+    --surface2:#EDEAE3;
+    --border:#E0DDD5;
+    --border-strong:#C4C1B8;
+    --text:#1C1A17;
+    --text-muted:#6A6760;
+    --text-hint:#AAA89F;
+    --radius:8px;
+    --radius-lg:12px;
+  }
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+  .header{
+    background:var(--text);
+    color:#F4F2EE;
+    padding:28px 40px 24px;
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:24px;
+  }
+  .header-eyebrow{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#AAA89F;margin-bottom:6px}
+  .header-title{font-size:26px;font-weight:300;letter-spacing:-0.02em;line-height:1.1}
+  .header-title span{font-weight:600}
+  .header-sub{font-family:'DM Mono',monospace;font-size:11px;color:#AAA89F;margin-top:8px}
+  .header-right{flex-shrink:0;text-align:right}
+  .phase-count{font-family:'DM Mono',monospace;font-size:11px;color:#AAA89F}
+
+  .nav-bar{
+    background:var(--surface);
+    border-bottom:1px solid var(--border);
+    padding:12px 40px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    position:sticky;top:0;z-index:100;
+  }
+  .nav-btn{background:none;border:1px solid var(--border-strong);border-radius:6px;width:34px;height:34px;cursor:pointer;font-size:16px;color:var(--text);display:flex;align-items:center;justify-content:center;transition:background 0.15s,border-color 0.15s}
+  .nav-btn:hover{background:var(--surface2);border-color:var(--text)}
+  .month-label{font-size:16px;font-weight:600;letter-spacing:-0.02em;min-width:160px;text-align:center}
+  .jump-select{margin-left:auto;border:1px solid var(--border-strong);border-radius:6px;padding:6px 10px;font-family:'DM Sans',sans-serif;font-size:13px;background:var(--surface);color:var(--text);cursor:pointer}
+
+  .cal-wrap{padding:24px 40px 40px}
+  .day-headers{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px}
+  .day-header{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-hint);text-align:center;padding:6px 0}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+
+  .day-cell{min-height:110px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:8px;overflow:hidden;transition:border-color 0.15s,box-shadow 0.15s;cursor:default}
+  .day-cell:hover{border-color:var(--border-strong)}
+  .day-cell.has-tasks:hover{border-color:var(--text);box-shadow:0 2px 12px rgba(0,0,0,0.08)}
+  .day-cell.outside{background:transparent;border-color:transparent}
+  .day-cell.outside .day-num{color:var(--text-hint)}
+  .day-cell.today{border-color:#1C1A17;border-width:2px}
+  .day-cell.today .day-num{background:var(--text);color:#F4F2EE;border-radius:4px;padding:1px 5px;display:inline-block}
+  .day-num{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;color:var(--text-muted);margin-bottom:5px;line-height:1}
+
+  .task-pill{font-size:9.5px;font-weight:500;padding:3px 6px;border-radius:4px;margin-bottom:3px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;display:block;letter-spacing:0.01em}
+  .task-pill.anchor{font-weight:700;font-size:10px;letter-spacing:0.02em}
+  .more-pill{font-family:'DM Mono',monospace;font-size:9px;color:var(--text-hint);margin-top:2px;letter-spacing:0.05em}
+
+  .tooltip{position:fixed;background:var(--text);color:#F4F2EE;border-radius:var(--radius-lg);padding:12px 14px;max-width:270px;min-width:190px;z-index:9999;pointer-events:none;display:none;box-shadow:0 8px 24px rgba(0,0,0,0.25)}
+  .tt-date{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:#AAA89F;margin-bottom:8px}
+  .tt-task{display:flex;align-items:flex-start;gap:7px;margin-bottom:5px;font-size:12px;line-height:1.4}
+  .tt-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0;margin-top:3px}
+  .tt-phase{font-family:'DM Mono',monospace;font-size:9px;color:#AAA89F;letter-spacing:0.05em}
+
+  .legend-wrap{background:var(--surface);border-top:1px solid var(--border);padding:20px 40px}
+  .legend-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-hint);margin-bottom:12px}
+  .legend-grid{display:flex;flex-wrap:wrap;gap:8px 20px}
+  .leg-item{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text-muted)}
+  .leg-swatch{width:12px;height:12px;border-radius:3px;flex-shrink:0;border:1px solid rgba(0,0,0,0.08)}
+
+  .footer{padding:16px 40px;font-family:'DM Mono',monospace;font-size:10px;color:var(--text-hint);letter-spacing:0.05em;border-top:1px solid var(--border);display:flex;justify-content:space-between}
+
+  @media(max-width:700px){
+    .header,.nav-bar,.cal-wrap,.legend-wrap,.footer{padding-left:16px;padding-right:16px}
+    .day-cell{min-height:70px;padding:5px}
+    .header-title{font-size:20px}
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="header-eyebrow">Nonprofit Documentary</div>
+    <div class="header-title">Vista Del Mar <span>Production Timeline</span></div>
+    <div class="header-sub">June – October 2026 &nbsp;·&nbsp; Airs 10/10/2026</div>
+  </div>
+  <div class="header-right">
+    <div class="phase-count" id="phase-count"></div>
+  </div>
+</div>
+
+<div class="nav-bar">
+  <button class="nav-btn" onclick="changeMonth(-1)">&#8592;</button>
+  <div class="month-label" id="month-label"></div>
+  <button class="nav-btn" onclick="changeMonth(1)">&#8594;</button>
+  <select class="jump-select" id="jump-select" onchange="jumpTo(this.value)">
+    <option value="">Jump to month…</option>
+    <option value="2026-5">June 2026</option>
+    <option value="2026-6">July 2026</option>
+    <option value="2026-7">August 2026</option>
+    <option value="2026-8">September 2026</option>
+    <option value="2026-9">October 2026</option>
+  </select>
+</div>
+
+<div class="cal-wrap">
+  <div class="day-headers">
+    <div class="day-header">Sun</div><div class="day-header">Mon</div><div class="day-header">Tue</div>
+    <div class="day-header">Wed</div><div class="day-header">Thu</div><div class="day-header">Fri</div><div class="day-header">Sat</div>
+  </div>
+  <div class="cal-grid" id="cal-grid"></div>
+</div>
+
+<div class="legend-wrap">
+  <div class="legend-label">Phases</div>
+  <div class="legend-grid" id="legend-grid"></div>
+</div>
+
+<div class="footer">
+  <span>Vista Del Mar — Production Timeline 2026</span>
+  <span id="footer-date"></span>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+const phases=[
+  {id:'dev',      label:'Development',          bg:'#DDD9F8', text:'#3B2F8A'},
+  {id:'treatment',label:'Visual treatment',      bg:'#C8EFE0', text:'#0A4D30'},
+  {id:'subjects', label:'Subject identification',bg:'#FDECC4', text:'#6B3F08'},
+  {id:'preproduction',label:'Pre-production',    bg:'#D4E8F8', text:'#1A4F7A'},
+  {id:'shoot',    label:'Shoot',                 bg:'#1C1A17', text:'#F4F2EE'},
+  {id:'post',     label:'Post-production',       bg:'#C9C3F0', text:'#2D2475'},
+  {id:'delivery', label:'Delivery / event',      bg:'#C8EFE0', text:'#0A4D30'},
+];
+
+function ph(id){return phases.find(p=>p.id===id)||phases[0]}
+
+const tasks=[
+  // BRAINSTORM
+  {phase:'dev',name:'In-person brainstorm — Junk Films + VDM',start:'2026-06-17',end:'2026-06-17',anchor:true},
+  {phase:'dev',name:'Internal debrief + synthesis',start:'2026-06-18',end:'2026-06-19'},
+  {phase:'dev',name:'Creative brief drafted — internal',start:'2026-06-22',end:'2026-06-24'},
+  {phase:'dev',name:'Creative brief STC for alignment',start:'2026-06-25',end:'2026-06-25'},
+  {phase:'dev',name:'Client FB on creative brief due',start:'2026-06-30',end:'2026-06-30'},
+
+  // DEVELOPMENT — subject matter + tone
+  {phase:'dev',name:'Project kickoff — scope + goals',start:'2026-07-13',end:'2026-07-13'},
+  {phase:'dev',name:'Define subject matter + key narratives',start:'2026-07-14',end:'2026-07-17'},
+  {phase:'dev',name:'Tone review — internal',start:'2026-07-20',end:'2026-07-21'},
+  {phase:'dev',name:'Tone + subject matter STC',start:'2026-07-22',end:'2026-07-22'},
+  {phase:'dev',name:'Client feedback on tone + subject due',start:'2026-07-27',end:'2026-07-27'},
+  {phase:'dev',name:'Tone + subject revisions',start:'2026-07-28',end:'2026-07-29'},
+  {phase:'dev',name:'Tone + subject approval',start:'2026-07-31',end:'2026-07-31'},
+
+  // VISUAL TREATMENT
+  {phase:'treatment',name:'R1 visual treatment — internal',start:'2026-07-22',end:'2026-07-24'},
+  {phase:'treatment',name:'R1 visual treatment STC',start:'2026-07-28',end:'2026-07-28'},
+  {phase:'treatment',name:'Client FB on visual treatment due',start:'2026-08-03',end:'2026-08-03'},
+  {phase:'treatment',name:'R2 visual treatment revisions',start:'2026-08-04',end:'2026-08-05'},
+  {phase:'treatment',name:'Visual treatment approval',start:'2026-08-07',end:'2026-08-07'},
+
+  // SUBJECT IDENTIFICATION
+  {phase:'subjects',name:'Identify + vet interview subjects',start:'2026-07-20',end:'2026-07-27'},
+  {phase:'subjects',name:'R1 subject list STC',start:'2026-07-28',end:'2026-07-28'},
+  {phase:'subjects',name:'Client FB on subjects due',start:'2026-08-03',end:'2026-08-03'},
+  {phase:'subjects',name:'Subject revisions + confirmations',start:'2026-08-04',end:'2026-08-06'},
+  {phase:'subjects',name:'Subject approval + outreach',start:'2026-08-07',end:'2026-08-07'},
+  {phase:'subjects',name:'Subject confirmations locked',start:'2026-08-14',end:'2026-08-14'},
+
+  // PRE-PRODUCTION
+  {phase:'preproduction',name:'Location scout',start:'2026-08-10',end:'2026-08-11'},
+  {phase:'preproduction',name:'Location approval',start:'2026-08-13',end:'2026-08-13'},
+  {phase:'preproduction',name:'Shot list draft — internal',start:'2026-08-12',end:'2026-08-14'},
+  {phase:'preproduction',name:'Shot list STC',start:'2026-08-17',end:'2026-08-17'},
+  {phase:'preproduction',name:'Client FB on shot list due',start:'2026-08-21',end:'2026-08-21'},
+  {phase:'preproduction',name:'Shot list revisions + approval',start:'2026-08-24',end:'2026-08-25'},
+  {phase:'preproduction',name:'Interview prep — subjects briefed',start:'2026-08-24',end:'2026-08-28'},
+  {phase:'preproduction',name:'Tech scout',start:'2026-08-31',end:'2026-08-31'},
+  {phase:'preproduction',name:'Crew confirm + call sheet',start:'2026-09-01',end:'2026-09-02'},
+
+  // SHOOT
+  {phase:'shoot',name:'SHOOT DAY',start:'2026-09-04',end:'2026-09-04',anchor:true},
+
+  // POST
+  {phase:'post',name:'Footage review + selects',start:'2026-09-05',end:'2026-09-08'},
+  {phase:'post',name:'Rough assembly cut',start:'2026-09-08',end:'2026-09-11'},
+  {phase:'post',name:'R1 cut — internal review',start:'2026-09-14',end:'2026-09-15'},
+  {phase:'post',name:'R1 cut STC',start:'2026-09-16',end:'2026-09-16'},
+  {phase:'post',name:'Client FB on R1 cut due',start:'2026-09-19',end:'2026-09-19'},
+  {phase:'post',name:'R2 cut — revisions',start:'2026-09-21',end:'2026-09-23'},
+  {phase:'post',name:'R2 cut STC',start:'2026-09-24',end:'2026-09-24'},
+  {phase:'post',name:'Client FB on R2 cut due',start:'2026-09-26',end:'2026-09-26'},
+  {phase:'post',name:'Color + sound mix',start:'2026-09-25',end:'2026-09-29'},
+  {phase:'post',name:'Final cut approval',start:'2026-09-29',end:'2026-09-29'},
+  {phase:'post',name:'Final render + QC',start:'2026-09-30',end:'2026-10-02'},
+
+  // DELIVERY + EVENT
+  {phase:'delivery',name:'Final delivery to client',start:'2026-10-03',end:'2026-10-03',anchor:true},
+  {phase:'delivery',name:'Client screen test window',start:'2026-10-03',end:'2026-10-09'},
+  {phase:'delivery',name:'AIRS AT CLIENT EVENT',start:'2026-10-10',end:'2026-10-10',anchor:true},
+];
+
+function parseDate(s){const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)}
+function fmtFull(d){return d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'})}
+
+let curYear=2026, curMonth=5;
+const today=new Date();
+
+function getTasksForDay(dateObj){
+  return tasks.filter(t=>{
+    const s=parseDate(t.start),e=parseDate(t.end);
+    return dateObj>=s&&dateObj<=e;
+  });
+}
+
+const monthNames=['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+function render(){
+  document.getElementById('month-label').textContent=monthNames[curMonth]+' '+curYear;
+  document.getElementById('jump-select').value=curYear+'-'+curMonth;
+
+  const grid=document.getElementById('cal-grid');
+  grid.innerHTML='';
+
+  const firstDay=new Date(curYear,curMonth,1).getDay();
+  const daysInMonth=new Date(curYear,curMonth+1,0).getDate();
+  const daysInPrev=new Date(curYear,curMonth,0).getDate();
+
+  for(let i=0;i<firstDay;i++){
+    const cell=document.createElement('div');
+    cell.className='day-cell outside';
+    const n=document.createElement('div');n.className='day-num';n.textContent=daysInPrev-firstDay+1+i;
+    cell.appendChild(n);grid.appendChild(cell);
+  }
+
+  for(let d=1;d<=daysInMonth;d++){
+    const cell=document.createElement('div');
+    cell.className='day-cell';
+    const dateObj=new Date(curYear,curMonth,d);
+    const isToday=dateObj.getFullYear()===today.getFullYear()&&dateObj.getMonth()===today.getMonth()&&dateObj.getDate()===today.getDate();
+    if(isToday)cell.classList.add('today');
+
+    const dayTasks=getTasksForDay(dateObj);
+    if(dayTasks.length>0)cell.classList.add('has-tasks');
+
+    const n=document.createElement('div');n.className='day-num';n.textContent=d;cell.appendChild(n);
+
+    const maxShow=4;
+    dayTasks.slice(0,maxShow).forEach(t=>{
+      const p=ph(t.phase);
+      const pill=document.createElement('div');
+      pill.className='task-pill'+(t.anchor?' anchor':'');
+      pill.style.background=p.bg;
+      pill.style.color=p.text;
+      pill.textContent=t.name;
+      cell.appendChild(pill);
+    });
+    if(dayTasks.length>maxShow){
+      const more=document.createElement('div');
+      more.className='more-pill';
+      more.textContent='+'+(dayTasks.length-maxShow)+' more';
+      cell.appendChild(more);
+    }
+
+    cell.addEventListener('mousemove',e=>{
+      if(dayTasks.length===0)return;
+      const tt=document.getElementById('tooltip');
+      tt.style.display='block';
+      let x=e.clientX+16,y=e.clientY+16;
+      if(x+270>window.innerWidth)x=e.clientX-286;
+      if(y+320>window.innerHeight)y=e.clientY-320;
+      tt.style.left=x+'px';tt.style.top=y+'px';
+      tt.innerHTML='<div class="tt-date">'+fmtFull(dateObj)+'</div>'+
+        dayTasks.map(t=>{
+          const p=ph(t.phase);
+          return '<div class="tt-task"><div class="tt-dot" style="background:'+p.bg+'"></div><div><div>'+t.name+'</div><div class="tt-phase">'+p.label+'</div></div></div>';
+        }).join('');
+    });
+    cell.addEventListener('mouseleave',()=>{document.getElementById('tooltip').style.display='none'});
+
+    grid.appendChild(cell);
+  }
+
+  const remaining=(7-((firstDay+daysInMonth)%7))%7;
+  for(let i=1;i<=remaining;i++){
+    const cell=document.createElement('div');
+    cell.className='day-cell outside';
+    const n=document.createElement('div');n.className='day-num';n.textContent=i;
+    cell.appendChild(n);grid.appendChild(cell);
+  }
+
+  const leg=document.getElementById('legend-grid');
+  leg.innerHTML='';
+  phases.forEach(p=>{
+    const item=document.createElement('div');item.className='leg-item';
+    const sw=document.createElement('div');sw.className='leg-swatch';sw.style.background=p.bg;
+    item.appendChild(sw);
+    const lbl=document.createElement('span');lbl.textContent=p.label;
+    item.appendChild(lbl);leg.appendChild(item);
+  });
+
+  const taskCount=tasks.filter(t=>{
+    const s=parseDate(t.start),e=parseDate(t.end);
+    const mStart=new Date(curYear,curMonth,1);
+    const mEnd=new Date(curYear,curMonth+1,0);
+    return s<=mEnd&&e>=mStart;
+  }).length;
+  document.getElementById('phase-count').innerHTML=taskCount+' tasks this month<br>'+phases.length+' phases total';
+  document.getElementById('footer-date').textContent='Generated '+today.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+}
+
+function changeMonth(dir){
+  curMonth+=dir;
+  if(curMonth>11){curMonth=0;curYear++;}
+  if(curMonth<0){curMonth=11;curYear--;}
+  render();
+}
+
+function jumpTo(val){
+  if(!val)return;
+  const[y,m]=val.split('-').map(Number);
+  curYear=y;curMonth=m;render();
+}
+
+render();
+</script>
+</body>
+</html>
