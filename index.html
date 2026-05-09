@@ -4,52 +4,209 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Vista Del Mar — Production Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0e0e10;
-      --panel: #17171b;
-      --text: #f4f4f5;
-      --muted: #a1a1aa;
-      --accent: #e4b363;
-      --border: #2a2a30;
+      --bg: #f5ecd9;
+      --bg-soft: #fbf4e2;
+      --paper: #fffaf0;
+      --ink: #2d2519;
+      --ink-soft: #5b4f3d;
+      --muted: #8a7a5e;
+      --accent: #c47a3d;
+      --accent-soft: #e2a96a;
+      --rule: #d9c79a;
+      --shadow: 0 1px 0 rgba(45, 37, 25, 0.04), 0 8px 24px -12px rgba(45, 37, 25, 0.18);
     }
     * { box-sizing: border-box; }
-    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
-    .wrap { max-width: 820px; margin: 0 auto; padding: 64px 24px; }
-    header { border-bottom: 1px solid var(--border); padding-bottom: 24px; margin-bottom: 40px; }
-    h1 { margin: 0 0 8px; font-size: 2.2rem; letter-spacing: -0.02em; }
-    .subtitle { color: var(--muted); margin: 0; font-size: 1.05rem; }
-    h2 { font-size: 1.1rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); margin: 40px 0 16px; }
-    ul.docs { list-style: none; padding: 0; margin: 0; }
-    ul.docs li { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 12px; transition: border-color 0.15s ease, transform 0.15s ease; }
-    ul.docs li:hover { border-color: var(--accent); transform: translateY(-1px); }
-    ul.docs a { display: block; padding: 18px 22px; color: var(--text); text-decoration: none; }
-    .doc-title { font-weight: 600; font-size: 1.05rem; margin-bottom: 4px; }
-    .doc-desc { color: var(--muted); font-size: 0.92rem; }
-    footer { margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; }
-    footer a { color: var(--accent); text-decoration: none; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      background:
+        radial-gradient(1200px 600px at 80% -10%, #ffe8b8 0%, rgba(255,232,184,0) 60%),
+        radial-gradient(900px 500px at -10% 110%, #f8d9a8 0%, rgba(248,217,168,0) 55%),
+        var(--bg);
+      color: var(--ink);
+      line-height: 1.65;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 80px 28px 96px;
+    }
+
+    /* Masthead */
+    .masthead {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: "Instrument Sans", sans-serif;
+      font-size: 0.78rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--rule);
+    }
+    .masthead .dot {
+      display: inline-block;
+      width: 7px; height: 7px;
+      background: var(--accent);
+      border-radius: 50%;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+
+    header.hero {
+      padding: 56px 0 40px;
+      border-bottom: 1px solid var(--rule);
+    }
+    h1 {
+      font-family: "Instrument Sans", sans-serif;
+      font-weight: 600;
+      font-size: clamp(2.6rem, 6vw, 3.8rem);
+      line-height: 1.05;
+      letter-spacing: -0.025em;
+      margin: 0 0 18px;
+      color: var(--ink);
+    }
+    h1 .amp {
+      font-family: "Instrument Serif", serif;
+      font-style: italic;
+      font-weight: 400;
+      color: var(--accent);
+    }
+    .subtitle {
+      font-family: "Instrument Serif", serif;
+      font-style: italic;
+      font-size: 1.25rem;
+      color: var(--ink-soft);
+      margin: 0;
+      max-width: 56ch;
+    }
+
+    h2 {
+      font-family: "Instrument Sans", sans-serif;
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.22em;
+      color: var(--accent);
+      margin: 56px 0 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    h2::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--rule);
+    }
+
+    ul.docs {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 14px;
+    }
+    ul.docs li {
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+    ul.docs li:hover {
+      border-color: var(--accent-soft);
+      transform: translateY(-2px);
+      box-shadow: 0 1px 0 rgba(45, 37, 25, 0.04), 0 14px 28px -14px rgba(45, 37, 25, 0.22);
+    }
+    ul.docs a {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 22px 24px;
+      color: var(--ink);
+      text-decoration: none;
+    }
+    .doc-arrow {
+      font-family: "Instrument Serif", serif;
+      font-style: italic;
+      color: var(--accent);
+      font-size: 1.4rem;
+      line-height: 1.1;
+      transition: transform 0.18s ease;
+    }
+    ul.docs li:hover .doc-arrow { transform: translateX(4px); }
+    .doc-body { flex: 1; }
+    .doc-title {
+      font-family: "Instrument Sans", sans-serif;
+      font-weight: 600;
+      font-size: 1.18rem;
+      margin-bottom: 4px;
+      letter-spacing: -0.005em;
+    }
+    .doc-desc {
+      color: var(--ink-soft);
+      font-size: 0.96rem;
+    }
+
+    footer {
+      margin-top: 80px;
+      padding-top: 22px;
+      border-top: 1px solid var(--rule);
+      color: var(--muted);
+      font-size: 0.85rem;
+      font-family: "Instrument Sans", sans-serif;
+      letter-spacing: 0.04em;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    footer a { color: var(--accent); text-decoration: none; border-bottom: 1px dotted var(--accent-soft); }
+    footer a:hover { color: var(--ink); }
+
+    @media (max-width: 520px) {
+      .wrap { padding: 56px 20px 72px; }
+      header.hero { padding: 40px 0 28px; }
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <header>
-      <h1>Vista Del Mar — Production Hub</h1>
-      <p class="subtitle">Working documents for the upcoming anthem film. Air date: October 10, 2026.</p>
+    <div class="masthead">
+      <span><span class="dot"></span>Junk Films · Issue №01</span>
+      <span>October 10, 2026</span>
+    </div>
+
+    <header class="hero">
+      <h1>Vista Del Mar <span class="amp">&amp;</span> the Production Hub</h1>
+      <p class="subtitle">Working documents for the upcoming anthem film — timelines, briefs, and assorted marginalia, kept in one warm corner of the internet.</p>
     </header>
 
     <h2>Documents</h2>
     <ul class="docs">
       <li>
         <a href="vista_del_mar_timeline.html">
-          <div class="doc-title">Production Timeline</div>
-          <div class="doc-desc">Full schedule of pre-production, production, and post milestones.</div>
+          <div class="doc-body">
+            <div class="doc-title">Production Timeline</div>
+            <div class="doc-desc">Full schedule of pre-production, production, and post milestones.</div>
+          </div>
+          <span class="doc-arrow">→</span>
         </a>
       </li>
     </ul>
 
     <footer>
-      Maintained by the Junk Films team ·
-      <a href="https://github.com/junkfilms/vista-del-mar">View repository</a>
+      <span>Maintained by the Junk Films team</span>
+      <a href="https://github.com/junkfilms/vista-del-mar">View repository ↗</a>
     </footer>
   </div>
 </body>
